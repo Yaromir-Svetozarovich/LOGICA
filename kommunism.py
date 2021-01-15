@@ -2,10 +2,9 @@ import pygame
 from random import randint
 import numpy as np
 
-
 RES = 1600, 900
 FPS = 20
-TILE = 12
+TILE = 14
 HEIGHT = 900
 WIDTH = 1600
 screen = pygame.display.set_mode(RES)
@@ -52,11 +51,15 @@ class Board:
                         (x * self.cell_size, y * self.cell_size, 
                         self.cell_size, self.cell_size), 0)
                     elif self.board[y][x] == 2:
-                        pygame.draw.rect(screen, pygame.Color('green'),
+                        pygame.draw.rect(screen, pygame.Color('red'),
                         (x * self.cell_size, y * self.cell_size, 
                         self.cell_size, self.cell_size), 0)
                     elif self.board[y][x] == 3:
-                        pygame.draw.rect(screen, pygame.Color('red'),
+                        pygame.draw.rect(screen, pygame.Color('green'),
+                        (x * self.cell_size, y * self.cell_size, 
+                        self.cell_size, self.cell_size), 0)
+                    elif self.board[y][x] == 4:
+                        pygame.draw.rect(screen, pygame.Color('blue'),
                         (x * self.cell_size, y * self.cell_size, 
                         self.cell_size, self.cell_size), 0)
                 #Отрисовка сетки
@@ -66,15 +69,29 @@ class Board:
     def update(self):
         for y in range(self.HEIGHT):
                 for x in range(self.WIDTH):
-                    if (self.board[y][x]  == 3 and  self.board[y-1][x] == 3 and self.board[y+1][x])== 3:
-                           self.board[y][x] = 2
-                           self.render()
-                    if self.board[y][x]  == 2 :
-                            self.board[y-1][x-1] == 3
-                            self.board[y+1][x-1] == 3
-                            self.board[y-1][x+1] == 3
-                            self.board[y+1][x-1] == 3
-                            self.render()
+                    if self.board[y][x]  == 2 and (self.board[y][x-1] == 1 or self.board[y][x+1] == 1 
+                        or self.board[y-1][x]==1 or self.board[y+1][x] ==1):
+                           self.board[y][x] = 3
+                     #Передача сигнала по проводам      
+                    if self.board[y][x]  == 3 and self.board[y][x-1] == 1:
+                            self.board[y][x-1] = 3
+
+                    if self.board[y][x]  == 3 and self.board[y][x+1] == 1:
+                            self.board[y][x+1] = 3
+
+                    if self.board[y][x]  == 3 and self.board[y-1][x] == 1:
+                            self.board[y-1][x] = 3
+
+                    if self.board[y][x]  == 3 and self.board[y+1][x] == 1:
+                            self.board[y+1][x] = 3
+                    #Логические элементы
+                    if self.board[y-1][x] == 3 and self.board[y][x-1] == 3 and self.board[y][x+1] == 3:
+                        self.board[y][x] = 4
+                    
+                    
+
+                            
+
 
 
                         
@@ -86,7 +103,7 @@ class Board:
         cell_y = mouse_pos[1] // self.cell_size
 
         if not(cell_x < 0 or cell_x >= self.WIDTH or cell_y < 0 or cell_y >= self.HEIGHT):
-            self.board[cell_y][cell_x] = (self.board[cell_y][cell_x] + 1) % 4
+            self.board[cell_y][cell_x] = (self.board[cell_y][cell_x] + 1) % 5
 
 
 world = Board(128, 64)
@@ -115,8 +132,8 @@ while running:
             running = False
         
     screen.fill((10,10,10))
-    world.render()
     world.update()
+    world.render()
     pygame.display.flip()
     
 pygame.quit()
