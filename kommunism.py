@@ -10,7 +10,7 @@ WIDTH =  1440
 pg.display.set_caption('ЛОГИКА')
 gameicon = pg.image.load('logo.png')
 pg.display.set_icon(gameicon)
-
+main_screen = pg.display.set_mode(RES)
 
 class Documentation:
     def __init__(self):
@@ -87,7 +87,7 @@ class Board:
                         elif self.board[y+1][x] == 1:
                             self.board[y+1][x] = 3
 #Логические элементы
-#Вся логика работы лог.элементов примитивна
+#Вся логика работы логических элементов примитивна
                     #Логическое "И"
                     if self.board[y][x] == 10 and self.board[y][x-1] == 3 and self.board[y][x+1] == 3:
                         self.board[y-1][x] = 3
@@ -125,19 +125,19 @@ class Board:
     def load_from_file(self):
         self.board = np.load('board.npy')
 
-    
-world = Board(88, 54)
-Doc = Documentation()
 mode_text = {0 : 'Меню', 1:'Рисование', 2:'Симуляция',3:'Сохранение схемы ...'}
 mode = 0
-# EventLoop - бесконечный (почти ) игровой цикл
-if __name__ == '__main__': 
+def main():    
+    world = Board(88, 54)
+    Doc = Documentation()
+    mode_text = {0 : 'Меню', 1:'Рисование', 2:'Симуляция',3:'Сохранение схемы ...'}
+    mode = 0
+    # EventLoop - бесконечный (почти ) игровой цикл
     running = True
     mDown = False 
     lastPos=[-1,-1]
     while running:
         for event in pg.event.get():
-
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and mode == 1:
                 lastPos = world.get_cellPos(event.pos)
                 world.get_click(lastPos)
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 lastPos = world.get_cellPos(event.pos)
                 world.get_logic(lastPos)
 
-            #Проверка на совпадение координат мыши с координатами кнопки    
+                #Проверка на совпадение координат мыши с координатами кнопки    
             mouse_position = pg.mouse.get_pos()
             doc_view = False
             if (mouse_position >=(1408,868) and mouse_position <=(1440, 900)) and (event.type == pg.MOUSEBUTTONDOWN and event.button == 1):
@@ -163,7 +163,7 @@ if __name__ == '__main__':
                 doc_view = not(doc_view)  
 
             if event.type == pg.KEYDOWN:
-                #print(event.key)
+                    #print(event.key)
                 if event.key == pg.QUIT:
                     running = False
                 elif event.key == pg.K_ESCAPE:
@@ -173,14 +173,12 @@ if __name__ == '__main__':
                 elif event.key ==  pg.K_s:
                     world.save_to_file()
                     mode = 3
-                    
-
                 elif event.key ==  pg.K_v:
                     world.load_from_file()
                     world.render()
 
 
-#Изменение состояние симулятора ( 1 = режим рисования, 2 = режим симуляции, 0 = пустой режим) 
+    #Изменение состояние симулятора ( 1 = режим рисования, 2 = режим симуляции, 0 = пустой режим) 
         if mode == 0:
             Doc.program_mode()
         if mode == 1:
@@ -199,10 +197,13 @@ if __name__ == '__main__':
         if mode == 4:
             mode = 0
             world.clear()
-        
+            
         Doc.buttom_render()
         pg.display.flip()
-    
+        
 
-    pg.time.delay(FPS)    
-    pg.quit()
+        pg.time.delay(FPS)    
+        pg.quit()
+    return mode_text
+if __name__ == '__main__': 
+    main()
